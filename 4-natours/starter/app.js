@@ -6,15 +6,29 @@ const app = express();
 // Middleware: function in the middle of request and response, can modify request and response
 app.use(express.json());
 
+app.use((req, res, next) => {
+  console.log('Hello from the middleware 😀');
+  //console.log(req.headers);
+  next();
+});
+
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
+});
+
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 // console.log(tours);
 
 const getAllTours = (req, res) => {
+  console.log(req.requestTime);
+
   res.status(200).json({
     status: 'success',
     // only count when we have an array
+    requestedAt: req.requestTime,
     results: tours?.length || 1,
     data: {
       tours,
